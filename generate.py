@@ -251,21 +251,6 @@ footer {
     text-align: center; margin-top: 40px; padding: 20px; color: #30363d;
     font-size: 0.8em; border-top: 1px solid #21262d; max-width: 800px; margin-left: auto; margin-right: auto;
 }
-.available-dates {
-    max-width: 800px; margin: 0 auto 20px; padding: 0 20px;
-}
-.available-dates summary {
-    color: #8b949e; cursor: pointer; font-size: 0.9em; margin-bottom: 8px;
-}
-.date-chips {
-    display: flex; flex-wrap: wrap; gap: 6px;
-}
-.date-chip {
-    background: #21262d; color: #8b949e; padding: 4px 12px;
-    border-radius: 20px; font-size: 0.85em; cursor: pointer; text-decoration: none;
-    border: 1px solid #30363d; transition: all 0.2s;
-}
-.date-chip:hover { background: #1f6feb33; color: #58a6ff; border-color: #58a6ff; }
 </style>
 </head>
 <body>
@@ -279,11 +264,6 @@ footer {
         </div>
     </div>
 </div>
-
-<details class="available-dates" id="dateList">
-    <summary>历史日期</summary>
-    <div class="date-chips" id="dateChips">加载中...</div>
-</details>
 
 <div class="content" id="newsContent">
     <div class="loading">加载中...</div>
@@ -340,37 +320,8 @@ async function loadNews(dateStr) {
     }
 }
 
-// Load available dates from directory listing
-async function loadAvailableDates() {
-    try {
-        // Try to fetch list from a known structure
-        // We'll use a simple approach: check known month directories
-        const now = new Date();
-        const chips = document.getElementById("dateChips");
-        let dates = [];
-        
-        // Check this year and month
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        
-        // Try up to 31 days
-        for (let d = 1; d <= 31; d++) {
-            const ds = `${y}-${m}-${String(d).padStart(2,"0")}`;
-            dates.push(ds);
-        }
-        
-        chips.innerHTML = dates.map(d => {
-            const parts = d.split("-");
-            return `<a href="${BASE}${parts[0]}/${parts[1]}/${parts[2]}/index.html" class="date-chip">${d}</a>`;
-        }).join("");
-    } catch(e) {
-        document.getElementById("dateChips").innerHTML = "暂无";
-    }
-}
-
 // Load today on page load
 loadNews(today);
-loadAvailableDates();
 </script>
 </body>
 </html>'''
