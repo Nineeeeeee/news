@@ -163,7 +163,7 @@ footer {{
 </style>
 </head>
 <body>
-<a href="/news/" class="back-link">⬅ 返回日历</a>
+<a href="../.." class="back-link">⬅ 返回日历</a>
 <h1>{date_str} 热点新闻</h1>
 {items_html}
 <footer>powered by TrendRadar · auto-generated</footer>
@@ -289,7 +289,7 @@ footer {
 <footer>powered by TrendRadar · auto-generated</footer>
 
 <script>
-const REPO = "/news";
+const BASE = window.location.pathname.replace(/index\.html$/, "");
 
 // Set date picker to today
 const today = new Date().toISOString().split("T")[0];
@@ -312,7 +312,7 @@ async function loadNews(dateStr) {
     document.getElementById("datePicker").value = dateStr;
     
     try {
-        const resp = await fetch(`${REPO}/${dateStr.slice(0,4)}/${dateStr.slice(5,7)}/${dateStr.slice(8,10)}/index.html`);
+        const resp = await fetch(`${BASE}${dateStr.slice(0,4)}/${dateStr.slice(5,7)}/${dateStr.slice(8,10)}/index.html`);
         if (resp.ok) {
             const html = await resp.text();
             // Extract body content only
@@ -358,7 +358,7 @@ async function loadAvailableDates() {
         
         chips.innerHTML = dates.map(d => {
             const parts = d.split("-");
-            return `<a href="${REPO}/${parts[0]}/${parts[1]}/${parts[2]}/index.html" class="date-chip">${d}</a>`;
+            return `<a href="${BASE}${parts[0]}/${parts[1]}/${parts[2]}/index.html" class="date-chip">${d}</a>`;
         }).join("");
     } catch(e) {
         document.getElementById("dateChips").innerHTML = "暂无";
