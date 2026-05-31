@@ -96,7 +96,10 @@ def generate_day_page(matches, target_date):
                 url = item.get("url", "")
                 rank = item["rank"]
                 kw = item["keyword"]
-                first = item.get("first_time", "")[-8:-3] if item.get("first_time") else ""
+                first = item.get("first_time", "")
+                if first:
+                    # Time format: "HH-MM" from TrendRadar DB
+                    first = first.replace("-", ":")
                 
                 title_html = f'<a href="{url}" target="_blank">{title}</a>' if url else title
                 items_html += '<div class="news-item">\n'
