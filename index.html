@@ -138,7 +138,7 @@ async function loadNews(dateStr) {
     document.getElementById("datePicker").value = dateStr;
     
     try {
-        const resp = await fetch(`${BASE}${dateStr.slice(0,4)}/${dateStr.slice(5,7)}/${dateStr.slice(8,10)}/index.html`);
+        const resp = await fetch(`${BASE}${dateStr.slice(0,4)}/${dateStr.slice(5,7)}/${dateStr.slice(8,10)}/index.html?_=${Date.now()}`);
         if (resp.ok) {
             const html = await resp.text();
             // Extract body content only
