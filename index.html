@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>热点新闻日报</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0f1117; color: #c9d1d9; min-height: 100vh;
+}
+.header {
+    background: #161b22; border-bottom: 1px solid #21262d; padding: 16px 20px;
+    position: sticky; top: 0; z-index: 10;
+}
+.header-inner {
+    max-width: 800px; margin: 0 auto; display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap;
+}
+.header h1 {
+    color: #58a6ff; font-size: 1.3em; white-space: nowrap;
+}
+.date-nav {
+    display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;
+}
+.date-nav input[type="date"] {
+    background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+    padding: 6px 12px; border-radius: 6px; font-size: 0.95em; font-family: inherit;
+}
+.date-nav input[type="date"]:focus { outline: none; border-color: #58a6ff; }
+.date-nav button {
+    background: #238636; border: none; color: white; padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 0.9em; font-family: inherit;
+}
+.date-nav button:hover { background: #2ea043; }
+.date-nav .today-btn {
+    background: #21262d; color: #c9d1d9; border: 1px solid #30363d;
+}
+.date-nav .today-btn:hover { background: #30363d; }
+.content {
+    max-width: 800px; margin: 0 auto; padding: 20px;
+}
+.platform-group {
+    margin-bottom: 24px; background: #161b22; border-radius: 8px;
+    padding: 16px; border: 1px solid #21262d;
+}
+.platform-name {
+    font-size: 1.1em; color: #58a6ff; margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 1px solid #21262d;
+}
+.news-item {
+    display: flex; align-items: baseline; gap: 8px; padding: 6px 0;
+    border-bottom: 1px solid #21262d22; font-size: 0.95em; line-height: 1.5;
+}
+.news-item:last-child { border-bottom: none; }
+.rank { color: #f0883e; font-weight: bold; min-width: 28px; font-size: 0.85em; }
+.kw-tag {
+    background: #1f6feb33; color: #58a6ff; padding: 1px 6px;
+    border-radius: 4px; font-size: 0.75em; white-space: nowrap;
+}
+.news-title { flex: 1; }
+.news-title a { color: #c9d1d9; text-decoration: none; }
+.news-title a:hover { color: #58a6ff; text-decoration: underline; }
+.time { color: #484f58; font-size: 0.8em; white-space: nowrap; }
+.empty {
+    text-align: center; padding: 60px 20px; color: #484f58; font-size: 1.1em;
+}
+.empty .icon { font-size: 3em; margin-bottom: 16px; }
+.loading {
+    text-align: center; padding: 60px; color: #484f58;
+}
+footer {
+    text-align: center; margin-top: 40px; padding: 20px; color: #30363d;
+    font-size: 0.8em; border-top: 1px solid #21262d; max-width: 800px; margin-left: auto; margin-right: auto;
+}
+.available-dates {
+    max-width: 800px; margin: 0 auto 20px; padding: 0 20px;
+}
+.available-dates summary {
+    color: #8b949e; cursor: pointer; font-size: 0.9em; margin-bottom: 8px;
+}
+.date-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+}
+.date-chip {
+    background: #21262d; color: #8b949e; padding: 4px 12px;
+    border-radius: 20px; font-size: 0.85em; cursor: pointer; text-decoration: none;
+    border: 1px solid #30363d; transition: all 0.2s;
+}
+.date-chip:hover { background: #1f6feb33; color: #58a6ff; border-color: #58a6ff; }
+</style>
+</head>
+<body>
+<div class="header">
+    <div class="header-inner">
+        <h1>热点新闻日报</h1>
+        <div class="date-nav">
+            <input type="date" id="datePicker">
+            <button onclick="loadDate()">查看</button>
+            <button class="today-btn" onclick="loadToday()">今天</button>
+        </div>
+    </div>
+</div>
+
+<details class="available-dates" id="dateList">
+    <summary>历史日期</summary>
+    <div class="date-chips" id="dateChips">加载中...</div>
+</details>
+
+<div class="content" id="newsContent">
+    <div class="loading">加载中...</div>
+</div>
+
+<footer>powered by TrendRadar · auto-generated</footer>
+
+<script>
+const REPO = "/news";
+
+// Set date picker to today
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("datePicker").value = today;
+
+function loadDate() {
+    const d = document.getElementById("datePicker").value;
+    if (!d) return;
+    loadNews(d);
+}
+
+function loadToday() {
+    document.getElementById("datePicker").value = today;
+    loadNews(today);
+}
+
+async function loadNews(dateStr) {
+    const content = document.getElementById("newsContent");
+    content.innerHTML = '<div class="loading">加载中...</div>';
+    document.getElementById("datePicker").value = dateStr;
+    
+    try {
+        const resp = await fetch(`${REPO}/${dateStr.slice(0,4)}/${dateStr.slice(5,7)}/${dateStr.slice(8,10)}/index.html`);
+        if (resp.ok) {
+            const html = await resp.text();
+            // Extract body content only
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const bodyContent = doc.querySelector("body");
+            // Remove header/footer from embedded page
+            const h1 = bodyContent.querySelector("h1");
+            const backLink = bodyContent.querySelector(".back-link");
+            const footer = bodyContent.querySelector("footer");
+            if (backLink) backLink.remove();
+            if (footer) footer.remove();
+            // Update h1 to just show date
+            if (h1) h1.style.marginTop = "0";
+            
+            content.innerHTML = bodyContent.innerHTML;
+        } else {
+            content.innerHTML = `<div class="empty"><div class="icon">📭</div>${dateStr} 暂无数据</div>`;
+        }
+    } catch (e) {
+        content.innerHTML = `<div class="empty"><div class="icon">📭</div>${dateStr} 暂无数据</div>`;
+    }
+}
+
+// Load available dates from directory listing
+async function loadAvailableDates() {
+    try {
+        // Try to fetch list from a known structure
+        // We'll use a simple approach: check known month directories
+        const now = new Date();
+        const chips = document.getElementById("dateChips");
+        let dates = [];
+        
+        // Check this year and month
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        
+        // Try up to 31 days
+        for (let d = 1; d <= 31; d++) {
+            const ds = `${y}-${m}-${String(d).padStart(2,"0")}`;
+            dates.push(ds);
+        }
+        
+        chips.innerHTML = dates.map(d => {
+            const parts = d.split("-");
+            return `<a href="${REPO}/${parts[0]}/${parts[1]}/${parts[2]}/index.html" class="date-chip">${d}</a>`;
+        }).join("");
+    } catch(e) {
+        document.getElementById("dateChips").innerHTML = "暂无";
+    }
+}
+
+// Load today on page load
+loadNews(today);
+loadAvailableDates();
+</script>
+</body>
+</html>
