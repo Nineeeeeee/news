@@ -292,7 +292,7 @@ footer {
 <footer>powered by TrendRadar · auto-generated</footer>
 
 <script>
-const BASE = window.location.pathname.replace(/index\.html$/, "");
+const BASE = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
 // Set date picker to today
 const today = new Date().toISOString().split("T")[0];
